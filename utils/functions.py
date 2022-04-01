@@ -1,4 +1,5 @@
 import torch
+from torch import nn
 import math
 
 #0 left hip
@@ -51,6 +52,17 @@ def reverse_rotation(J3d_R, theta, root):
   J = J3d_R # need copy????
   return rotation(J.cuda(), theta.cuda(), root.unsqueeze(-1).cuda(), True)
 
+def temporal_loss(J, K, J_R, K_R): # J is J3d at time t and K is J3d at time t+k. J_R means the reversed rotation of J
+  
+  #print(torch.norm(J.reshape(J.shape[0], 3, 16) - K.reshape(J.shape[0], 3, 16) - J_R.reshape(J.shape[0], 3, 16) + K_R.reshape(J.shape[0], 3, 16), dim=1).shape)
+  #stop
+  mse_fn = nn.MSELoss()
+  return mse_fn(J.reshape(J.shape[0], 3, 16) - K.reshape(J.shape[0], 3, 16) - J_R.reshape(J.shape[0], 3, 16) + K_R.reshape(J.shape[0], 3, 16), torch.zeros(J.shape[0], 3, 16).cuda())
+  #return torch.norm(J.reshape(J.shape[0], 3, 16) - K.reshape(J.shape[0], 3, 16) - J_R.reshape(J.shape[0], 3, 16) + K_R.reshape(J.shape[0], 3, 16), dim=1)**2
+'''
+def temporal_loss(J, K, J_R, K_R): # J is J3d at time t and K is J3d at time t+k. J_R means the reversed rotation of J
+  return torch.norm(J - K - J_R + K_R, dim=1)**2
+'''
 
 '''
 def random_rotation(J3d):

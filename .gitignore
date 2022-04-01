@@ -1,3 +1,4 @@
 models/*
 __pycache__/*
 detections_and_morphing_network/*
+utils/__pycache__/*
